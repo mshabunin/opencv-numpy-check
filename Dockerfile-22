@@ -1,0 +1,14 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y \
+    cmake ninja-build git g++ gfortran ccache pkg-config \
+    libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev \
+    python3-pip python3-dev python3-virtualenv \
+    libopenblas-dev liblapack-dev
+
+ENV PATH=/scripts:/workspace/.local/bin:${PATH}
+ENV HOME=/workspace
+ENV XDG_CACHE_HOME=/workspace/.cache
+ENV CCACHE_DIR=/workspace/.ccache
+

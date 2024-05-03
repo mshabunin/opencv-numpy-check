@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -exu
+
+VER=$1
+
+S=/workspace/numpy-${VER}
+E=/workspace/venv-${VER}
+
+
+if [ ! -d "${S}" ] ; then
+git clone \
+    -b ${VER} \
+    --depth=1 \
+    --recurse-submodules \
+    --shallow-submodules \
+    -- https://github.com/numpy/numpy.git ${S}
+fi
+
+virtualenv --clear ${E}
+. ${E}/bin/activate
+
+pushd ${S}
+pip install .
+popd

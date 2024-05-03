@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -exu
+
+# build and test versions
+VER=$1
+TVER=${2-$VER}
+
+# build and test environments
+E=/workspace/venv-${VER}
+TE=/workspace/venv-${TVER}
+
+build() {
+D=$1 ; shift 1
+mkdir -p $D
+pushd $D && rm -rf *
+cmake -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DPYTHON3_LIMITED_API=ON \
+        ${@} \
+    /opencv
+ninja
+}
+
+
+test_() {
+D=$1 ; shift 1
+pushd $D
+OPENCV_TEST_DATA_PATH=/opencv_extra/testdata \
+OPENCV_SAMPLES_DATA_PATH=/opencv/samples/data \
+PYTHONPATH=`pwd`/python_loader \
+    python3 /opencv/modules/python/test/test.py --repo /opencv
+PYTHONPATH=`pwd`/python_loader \
+    python3 /scripts/info.py
+popd
+}
+
+D=/workspace/build-opencv
+
+. ${E}/bin/activate
+build ${D}
+deactivate
+
+. ${TE}/bin/activate
+test_ ${D}
+deactivate
